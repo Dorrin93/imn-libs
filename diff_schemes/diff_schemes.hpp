@@ -6,7 +6,14 @@
 #include <string>
 #include <iostream>
 
+/**
+ * \addtogroup imn
+ * \{
+ */
+
+//* Engineering Numerical Methods functions
 namespace imn{
+
 /**
  * \typedef Input function
  * Differetial equasion we try to solve
@@ -47,8 +54,8 @@ typedef double(*rkfunc)(double, double, double);
  * \param sol_funct Accurate solution function. Default to 0 (NULL).
  *
  */
-void explicit_euler(input inp_func, const double icondition, const double dt,
-        const double begin, const double end, std::ofstream &file, 
+void explicit_euler(input inp_func, double icondition, double dt,
+        double begin, double end, std::ofstream &file, 
         solution sol_func = 0);
 
 /**
@@ -73,8 +80,8 @@ void explicit_euler(input inp_func, const double icondition, const double dt,
  * \param sol_funct Accurate solution function. Default to 0 (NULL).
  *
  */
-void implicit_euler(input inp_func, input inp_deriv, const double icondition,
-        const double dt, const double begin, const double end, 
+void implicit_euler(input inp_func, input inp_deriv, double icondition,
+        double dt, double begin, double end, 
         std::ofstream &file, solution sol_func = 0);
 
 /**
@@ -100,9 +107,9 @@ void implicit_euler(input inp_func, input inp_deriv, const double icondition,
  * \param sol_funct Accurate solution function. Default to 0 (NULL).
  *
  */
-void newton_euler(input inp_func, input inp_deriv, const double icondition,
-        const double dt, const double begin, const double end, 
-        std::ofstream &file, const double stop = 1e-6, solution sol_func = 0);
+void newton_euler(input inp_func, input inp_deriv, double icondition,
+        double dt, double begin, double end, 
+        std::ofstream &file, double stop = 1e-6, solution sol_func = 0);
 
 /**
  * \brief Explicit Euler method with Richardson extrapolation
@@ -125,8 +132,8 @@ void newton_euler(input inp_func, input inp_deriv, const double icondition,
  * \param sol_funct Accurate solution function. Default to 0 (NULL).
  *
  */
-void richardson_euler(input inp_func, const double icondition, const double dt,
-        const double begin, const double end, std::ofstream &file, 
+void richardson_euler(input inp_func, double icondition, double dt,
+        double begin, double end, std::ofstream &file, 
         solution sol_func = 0);
 
 /**
@@ -154,9 +161,9 @@ void richardson_euler(input inp_func, const double icondition, const double dt,
  * \param sol_funct Accurate solution function. Default to 0 (NULL).
  *
  */
-void autostep_euler(input inp_func, const double icondition, const double init_dt,
-        const double begin, const double end, std::ofstream &file,
-        const double tolerance = 1e-5, const double S = 0.75, solution sol_func = 0);
+void autostep_euler(input inp_func, double icondition, double init_dt,
+        double begin, double end, std::ofstream &file,
+        double tolerance = 1e-5, double S = 0.75, solution sol_func = 0);
 
 /**
  * \brief Explicit Runge-Kutta 4 scheme
@@ -178,10 +185,12 @@ void autostep_euler(input inp_func, const double icondition, const double init_d
  * \param file Output file stream to write results
  *
  */
-void rk4(rkfunc equasion1, rkfunc equasion2, const double cond_x, const double cond_y,
-        const double dt, const double begin, const double end, std::ofstream &file);
+void rk4(rkfunc equasion1, rkfunc equasion2, double cond_x, double cond_y,
+        double dt, double begin, double end, std::ofstream &file);
 
 }
+
+/** \} End of group */
 
 #endif
 

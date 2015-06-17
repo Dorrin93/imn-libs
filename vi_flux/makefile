@@ -1,10 +1,10 @@
 #Simple makefile for test purposes
 
 CXX=g++
-CXXFLAGS= -Wall -O2 -std=c++0x
+CXXFLAGS= -Wall -O2 -std=c++0x -g
 LIBS= -lm
 OUT=test_main
-OBJS=diff_schemes
+OBJS=vi_flux
 
 $(OUT): $(OUT).cpp $(OBJS).o
 	$(CXX) $(CXXFLAGS) $(LIBS) $^ -o $@
