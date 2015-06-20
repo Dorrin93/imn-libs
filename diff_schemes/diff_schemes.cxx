@@ -1,16 +1,27 @@
+/**
+ * \file   diff_schemes.cxx
+ * \Author Bartłomiej Meder (bartem93@gmail.com)
+ * \date   June, 2015
+ * \brief  Differential equasions numerical methods
+ *
+ * Source for implementation of numerical methods created for solving differential equasions.
+ * Methods incudes explicit and impicit Euler methods and Runge-Kutta 4 scheme.
+ */
+
 #include "diff_schemes.hpp"
 
 /////////////////////////////////////////////////////////////////////////////////////
-void imn::explicit_euler(input inp_func, double icondition, double dt, 
-        double begin, double end, std::ofstream &file, solution sol_func)
+void imn::explicit_euler(input inp_func, double icondition, double dt, double begin, double end,
+                         std::ofstream &file, solution sol_func)
 {
     // checking difference between solution(begin) and condition,
     // if more then about 0 user probably uses bad input
     if(sol_func && fabs(sol_func(begin) - icondition) > 1e-9){
-        std::cerr << "Difference between solution function and initial \
-            condition is " << sol_func(begin) - icondition << std::endl;
-        std::cerr << "It should be about 0, so input could be incorrect."
-            << std::endl;
+
+        std::cerr << "Difference between solution function and initial condition is "
+                  << sol_func(begin) - icondition << std::endl;
+        std::cerr << "It should be about 0, so input could be incorrect." << std::endl;
+
     }
 
     // checking if file is was open and eventually opening it
@@ -19,8 +30,10 @@ void imn::explicit_euler(input inp_func, double icondition, double dt,
         file.open("explicit_euler.dat");
 
     file << "# t u_n(t)";
+
     if(sol_func)
         file << " u0(t) u0(t)-u_n(t)";
+
     file << std::endl;
 
     file << begin << " " << icondition;
