@@ -10,6 +10,9 @@
 
 #include "diff_schemes.hpp"
 
+// testing auto purpose
+template<typename T>class TD;
+
 /////////////////////////////////////////////////////////////////////////////////////
 void imn::explicit_euler(input inp_func, double icondition, double dt, double begin, double end,
                          std::ofstream &file, solution sol_func)
@@ -25,7 +28,7 @@ void imn::explicit_euler(input inp_func, double icondition, double dt, double be
     }
 
     // checking if file is was open and eventually opening it
-    bool was_open = file.is_open();
+    auto was_open = file.is_open();
     if(!was_open)
         file.open("explicit_euler.dat");
 
@@ -37,14 +40,14 @@ void imn::explicit_euler(input inp_func, double icondition, double dt, double be
     file << std::endl;
 
     file << begin << " " << icondition;
-    if(sol_func) 
+    if(sol_func)
         file << " " << sol_func(begin) << " " << sol_func(begin) - icondition;
     file << std::endl;
 
-    double u_n = icondition;
+    auto u_n = icondition;
 
-    for(double i = begin + dt; i <= end; i += dt){
-        
+    for(auto i = begin + dt; i <= end; i += dt){
+
         u_n = u_n + dt * inp_func(i - dt, u_n);
 
         file << i << " " << u_n;
@@ -61,8 +64,8 @@ void imn::explicit_euler(input inp_func, double icondition, double dt, double be
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-void imn::implicit_euler(input inp_func, input inp_deriv, double icondition, 
-        double dt, double begin, double end, std::ofstream &file, 
+void imn::implicit_euler(input inp_func, input inp_deriv, double icondition,
+        double dt, double begin, double end, std::ofstream &file,
         solution sol_func)
 {
     if(sol_func && fabs(sol_func(begin) - icondition) > 1e-9){
@@ -72,7 +75,7 @@ void imn::implicit_euler(input inp_func, input inp_deriv, double icondition,
             << std::endl;
     }
 
-    bool was_open = file.is_open();
+    auto was_open = file.is_open();
     if(!was_open)
         file.open("implicit_euler.dat");
 
@@ -82,13 +85,13 @@ void imn::implicit_euler(input inp_func, input inp_deriv, double icondition,
     file << std::endl;
 
     file << begin << " " << icondition;
-    if(sol_func) 
+    if(sol_func)
         file << " " << sol_func(begin) << " " << sol_func(begin) - icondition;
     file << std::endl;
 
-    double u_n = icondition;
+    auto u_n = icondition;
 
-    for(double i = begin + dt; i <= end; i += dt){
+    for(auto i = begin + dt; i <= end; i += dt){
 
         u_n = u_n / (1. - dt * inp_deriv(i, u_n));
 
@@ -106,7 +109,7 @@ void imn::implicit_euler(input inp_func, input inp_deriv, double icondition,
 
 /////////////////////////////////////////////////////////////////////////////////////
 void imn::newton_euler(input inp_func, input inp_deriv, double icondition,
-        double dt, double begin, double end, 
+        double dt, double begin, double end,
         std::ofstream &file, double stop, solution sol_func)
 {
     if(sol_func && fabs(sol_func(begin) - icondition) > 1e-9){
@@ -116,7 +119,7 @@ void imn::newton_euler(input inp_func, input inp_deriv, double icondition,
             << std::endl;
     }
 
-    bool was_open = file.is_open();
+    auto was_open = file.is_open();
     if(!was_open)
         file.open("newton_euler.dat");
 
@@ -127,24 +130,26 @@ void imn::newton_euler(input inp_func, input inp_deriv, double icondition,
 
 
     file << begin << " " << 0 << " " << icondition;
-    if(sol_func) 
+    if(sol_func)
         file << " " << sol_func(begin) << " " << sol_func(begin) - icondition;
     file << std::endl;
 
-    double u_n = icondition;
+    auto u_n = icondition;
     // value from external iteration before
-    double u_pn = u_n;
+    auto u_pn = u_n;
     // value from internal iteration before
-    double u_wn = u_n;
-    int iter = 0;
+    auto u_wn = u_n;
+    auto iter = 0;
 
-    for(double i = begin + dt; i <= end; i += dt, iter = 0, u_pn = u_n){
+    //TD<decltype(u_wn)> u_wnType; // compiler says it's double :3
+
+    for(auto i = begin + dt; i <= end; i += dt, iter = 0, u_pn = u_n){
 
         while(stop < fabs(u_n - u_wn) || !iter){
             u_wn = u_n;
             u_n = u_wn - (u_wn - u_pn - dt * inp_func(i, u_wn)) / (1. - dt * inp_deriv(i, u_wn));
 
-            ++iter; 
+            ++iter;
         }
 
         file << i << " " << iter << " " << u_n;
@@ -170,7 +175,7 @@ void imn::richardson_euler(input inp_func, double icondition, double dt,
             << std::endl;
     }
 
-    bool was_open = file.is_open();
+    auto was_open = file.is_open();
     if(!was_open)
         file.open("richardson_euler.dat");
 
@@ -181,22 +186,22 @@ void imn::richardson_euler(input inp_func, double icondition, double dt,
 
 
     file << begin << " " << icondition;
-    if(sol_func) 
+    if(sol_func)
         file << " " << sol_func(begin) << " " << sol_func(begin) - icondition;
     file << std::endl;
 
-    double u_n = icondition;
+    auto u_n = icondition;
 
-    for(double i = begin + 2*dt; i <= end; i += 2*dt){
+    for(auto i = begin + 2.*dt; i <= end; i += 2.*dt){
 
         // first short step
-        double u_1 = u_n + dt * inp_func(i - 2 * dt, u_n);
+        auto u_1 = u_n + dt * inp_func(i - 2. * dt, u_n);
         // second short step
-        double u_2 = u_1 + dt * inp_func(i - dt, u_1);
+        auto u_2 = u_1 + dt * inp_func(i - dt, u_1);
         // long step
-        double u_l = u_n + 2 * dt * inp_func(i - 2 * dt, u_n);
+        auto u_l = u_n + 2. * dt * inp_func(i - 2. * dt, u_n);
 
-        u_n = 2 * u_2 - u_l;
+        u_n = 2. * u_2 - u_l;
 
         file << i << " " << u_n;
         if(sol_func)
@@ -227,7 +232,7 @@ void imn::autostep_euler(input inp_func, double icondition, double init_dt,
             << std::endl;
     }
 
-    bool was_open = file.is_open();
+    auto was_open = file.is_open();
     if(!was_open)
         file.open("autostep_euler.dat");
 
@@ -238,19 +243,19 @@ void imn::autostep_euler(input inp_func, double icondition, double init_dt,
 
 
     file << begin << " " << init_dt << " " << icondition;
-    if(sol_func) 
+    if(sol_func)
         file << " " << sol_func(begin) << " " << sol_func(begin) - icondition;
     file << std::endl;
 
-    double u_n = icondition;
-    double dt = init_dt;
-    int cnt = 0;
+    auto u_n = icondition;
+    auto dt = init_dt;
+    auto cnt = 0;
 
-    for(double i = begin + 2*dt; i <= end || cnt < 5; i += 2*dt, ++cnt){
+    for(auto i = begin + 2*dt; i <= end || cnt < 5; i += 2*dt, ++cnt){
 
-        double u_1 = u_n + dt * inp_func(i - 2 * dt, u_n);
-        double u_2 = u_1 + dt * inp_func(i - dt, u_1);
-        double u_l = u_n + 2 * dt * inp_func(i - 2 * dt, u_n);
+        auto u_1 = u_n + dt * inp_func(i - 2 * dt, u_n);
+        auto u_2 = u_1 + dt * inp_func(i - dt, u_1);
+        auto u_l = u_n + 2 * dt * inp_func(i - 2 * dt, u_n);
 
         if(fabs(u_2 - u_l) < tolerance){
             u_n = u_2;
@@ -279,7 +284,7 @@ void imn::autostep_euler(input inp_func, double icondition, double init_dt,
 void imn::rk4(rkfunc equasion1, rkfunc equasion2, double cond_x, double cond_y,
         double dt, double begin, double end, std::ofstream &file)
 {
-    bool was_open = file.is_open();
+    auto was_open = file.is_open();
     if(!was_open)
         file.open("rk4.dat");
 
@@ -287,23 +292,23 @@ void imn::rk4(rkfunc equasion1, rkfunc equasion2, double cond_x, double cond_y,
 
     file << begin << " " << cond_x << " " << cond_y << std::endl;
 
-    double x = cond_x;
-    double y = cond_y;
-    
+    auto x = cond_x;
+    auto y = cond_y;
 
-    for(double i = begin + dt; i <= end; i += dt){
 
-        double k1x = equasion1(i - dt, x, y);
-        double k1y = equasion2(i - dt, x, y);
+    for(auto i = begin + dt; i <= end; i += dt){
 
-        double k2x = equasion1(i - dt + dt / 2, x + dt * k1x / 2, y + dt * k1y / 2);
-        double k2y = equasion2(i - dt + dt / 2, x + dt * k1x / 2, y + dt * k1y / 2);
+        auto k1x = equasion1(i - dt, x, y);
+        auto k1y = equasion2(i - dt, x, y);
 
-        double k3x = equasion1(i - dt + dt / 2, x + dt * k2x / 2, y + dt * k2y / 2);
-        double k3y = equasion2(i - dt + dt / 2, x + dt * k2x / 2, y + dt * k2y / 2);
+        auto k2x = equasion1(i - dt + dt / 2, x + dt * k1x / 2, y + dt * k1y / 2);
+        auto k2y = equasion2(i - dt + dt / 2, x + dt * k1x / 2, y + dt * k1y / 2);
 
-        double k4x = equasion1(i, x + dt * k3x, y + dt * k3y);
-        double k4y = equasion2(i, x + dt * k3x, y + dt * k3y);
+        auto k3x = equasion1(i - dt + dt / 2, x + dt * k2x / 2, y + dt * k2y / 2);
+        auto k3y = equasion2(i - dt + dt / 2, x + dt * k2x / 2, y + dt * k2y / 2);
+
+        auto k4x = equasion1(i, x + dt * k3x, y + dt * k3y);
+        auto k4y = equasion2(i, x + dt * k3x, y + dt * k3y);
 
         x = x + (dt / 6.) * (k1x + 2 * k2x + 2 * k3x + k4x);
         y = y + (dt / 6.) * (k1y + 2 * k2y + 2 * k3y + k4y);
@@ -315,4 +320,3 @@ void imn::rk4(rkfunc equasion1, rkfunc equasion2, double cond_x, double cond_y,
     if(!was_open)
         file.close();
 }
-

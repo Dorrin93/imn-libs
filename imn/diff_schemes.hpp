@@ -8,12 +8,11 @@
  * Methods incudes explicit and impicit Euler methods and Runge-Kutta 4 scheme.
  */
 
-#ifndef __DIFF_SCHEMES__
-#define __DIFF_SCHEMES__
+#ifndef __IMN_DIFF_SCHEMES__
+#define __IMN_DIFF_SCHEMES__
 
 #include <fstream>
 #include <cmath>
-#include <string>
 #include <iostream>
 
 /**
@@ -30,19 +29,19 @@ namespace imn {
     * First argument is time and second is some variable.
     * Could also be its own derivative.
     */
-    typedef double(*input)(double, double);
+    using input = double(*)(double, double);
 
     /**
     * Solution fuction
     * Funtion returning accurate solution of differential equasion.
     */
-    typedef double(*solution)(double);
+    using solution = double(*)(double);
 
     /**
-    * Function for Runge-Kutta scheme
-    * First argument is time, next two are variables.
+    * Function for Runge-Kutta 4 scheme
+    * First argument is time, next two are variables values.
     */
-    typedef double(*rkfunc)(double, double, double);
+    using rkfunc = double(*)(double, double, double);
 
 
     /**
@@ -197,4 +196,3 @@ namespace imn {
 /** \} End of group */
 
 #endif
-

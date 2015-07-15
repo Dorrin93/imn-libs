@@ -1,36 +1,34 @@
-#define __LAB4__
+#include<array>
+#include<memory>
+#include<iostream>
+#define __LAB2__
 
 #ifdef __LAB1__
-#include "diff_schemes/diff_schemes.hpp"
-
-// definition without declaration 'cause test purposes etc.
-// differential equasion and its solution (for comparsion)
-double eufunc(double t, double u){ return u * cos(t); }
-
-double solu(double t){ return exp(sin(t)); }
-
-// if your derivative don't need 'u', you have to do something like that
-double pack_cos(double t, double u){ return cos(t); }
-
-// rk4 functions with The Beatles reference
-double warm(double t, double paul, double john){ return john; }
-
-double gun(double t, double paul, double john){ return -paul; }
+#include "imn/diff_schemes.hpp"
 #endif
 
-#ifdef __LAB4__
-#include "vi_flow.hpp"
-// vorticity function
-double vor(double x, double y){ return -0.5 * (2 * y); }
-
-// flux function
-double flu(double x, double y){ return -0.5 * ((y*y*y)/3. - y*0.5*0.5); }
+#ifdef __LAB2__
+#include "imn/iter_schemes.hpp"
+// just workaround, scroll further
+const auto rho1 = [](double x, double y){ return (1./(900.*M_PI))*exp(-(x/30.)*(x/30.)-(y/30.)*(y/30.)); };
 #endif
 
 int main(){
+
     std::ofstream happiness;
 
     #ifdef __LAB1__
+    // differential equasion and its solution (for comparsion)
+    auto eufunc = [](double t, double u){ return u*cos(t); };
+    auto solu = [](double t){ return exp(sin(t)); };
+
+    // if your derivative don't need 'u', you have to do something like that
+    auto pack_cos = [](double t, double u){ return cos(t); };
+
+    // rk4 functions with The Beatles reference
+    auto warm = [](double t, double paul, double john){ return john; };
+    auto gun = [](double t, double paul, double john){ return -paul; };
+
     imn::explicit_euler(eufunc, 1, M_PI/400., 0, 4.*M_PI, happiness, solu);
     imn::implicit_euler(eufunc, pack_cos, 1, M_PI/400., 0, 4.*M_PI, happiness, solu);
     imn::newton_euler(eufunc, pack_cos, 1, M_PI/400., 0, 4.*M_PI, happiness, 1e-6, solu);
@@ -39,20 +37,25 @@ int main(){
     imn::rk4(warm, gun, 0, 1, 0.1, 0, 4.*M_PI, happiness);
     #endif
 
-    #ifdef __LAB4__
-    imn::Point a,b,c,d;
-    a = {-0.1, -0.5};
-    b = {0.1, -0.5};
-    c = {-0.1, 0};
-    d = {0.1, 0};
-    imn::Wall w1, w2, w3,w4;
-    w1 = {a, c, imn::Wall::LEFT};
-    w2 = {b, d, imn::Wall::RIGHT};
-    w3 = {c, d, imn::Wall::UP};
-    w4 = {a, b, imn::Wall::DOWN};
-    std::vector<imn::Wall*> walls = {&w1, &w2, &w3, &w4};
-    imn::poiseuille(-1, 2, -0.5, 0.5, 0.01, 0.01, flu, vor, happiness);
-    imn::ns_obstacle(-1, 2, -0.5, 0.5, 0.01, 0.01, flu, vor, walls, happiness);
+    #ifdef __LAB2__
+    // first we need to create grid
+    // let's say it's grounded, so we don't apply potential function
+    auto grid = std::make_unique<imn::Grid>(-129, 129, -129, 129, 2., 2.);
+
+    // then we need to define potential density
+    // it's prety complicated, thus we will use two lambdas
+    // rho1 is global - workaround (sadly, you cannot cast capturing lambda to function)
+    const auto pdens = [](double x, double y) { return rho1(x - 30, y - 30) + rho1(x + 30, y + 30); };
+
+    // we want to find optimal omega value, so we will iterate through some candidates
+    std::array<double, 6> omegas{0.75, 0.95, 1.2, 1.5, 1.95, 1.99};
+
+    for(auto o : omegas){
+        imn::poisson_pr(*grid, o, pdens, happiness);
+        grid->clear();
+    }
+
+    imn::poisson_dens_grid(*grid, 1, 16, pdens, happiness, 1e-8, true);
     #endif
 
     return 0;

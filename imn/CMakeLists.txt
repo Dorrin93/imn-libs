@@ -1,14 +1,16 @@
-cmake_minimum_required(VERSION 3.2)
-project(imn_libs)
+cmake_minimum_required(VERSION 3.2.3)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -lm -O2")
+
+project(imn_libs CXX)
 # Version
 set(Imn_VERSION_MAJOR 2)
 set(Imn_VERSION_MINOR 1)
 
-add_library(Imn diff_schemes.cxx vi_flow.cxx)
+add_library(Imn diff_schemes.cxx grid.cxx iter_schemes.cxx utils.cxx)
 target_include_directories(Imn PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS Imn DESTINATION bin)
-install(FILES diff_schemes.hpp vi_flow.hpp DESTINATION include)
+install(FILES diff_schemes.hpp grid.hpp iter_schemes.hpp utils.hpp DESTINATION include)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lm")
 
