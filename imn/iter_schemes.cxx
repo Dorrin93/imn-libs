@@ -5,11 +5,9 @@
  * \brief  Differential equasions numerical methods
  *
  * Source for implementation of numerical methods created for solving partial elliptical differential equasions.       |
- * Methods incudes TODO
  */
 
 #include "iter_schemes.hpp"
-#include <iostream>
 
 auto tt = [](double n){return n*n;};
 

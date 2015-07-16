@@ -6,7 +6,7 @@
  */
  #include "grid.hpp"
 
- imn::Grid::Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial):
+ imn::Grid::Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial, bool widen):
     _x_min(x_min), _x_max(x_max), _y_min(y_min), _y_max(y_max), _dx(dx), _dy(dy)
  {
     auto size = [](int min, int max, double df)
@@ -14,6 +14,11 @@
 
     _x_size = size(_x_min, _x_max, _dx);
     _y_size = size(_y_min, _y_max, _dy);
+
+     if(widen){
+         ++_x_size;
+         ++_y_size;
+     }
 
     _mtx = vMatrix(_x_size * _y_size, 0);
 
