@@ -20,7 +20,6 @@ namespace imn{
     class OGrid: public Grid{
 
         using ofunc = std::function<bool(double, double)>;
-        using vNfunc = std::function<double(int, int, Ptype)>;
 
     public:
         enum class Ptype {left, right, up, down, lu, ld, ru, rd, in};
@@ -41,10 +40,13 @@ namespace imn{
         void von_Neumann_cond(func2d function, Ptype pointType);
 
     private:
+        using vNfunc = std::function<double(int, int, Ptype)>;
+
         ofunc obstacle = nullptr;
-        Ptype type(unsigned i, unsigned j) const noexcept;
+        Ptype con_type(unsigned i, unsigned j) const noexcept;
         double pFlowFunc(unsigned i, unsigned j, Ptype type) const noexcept;
         double viFlowFunc(unsigned i, unsigned j, Ptype type) const noexcept;
+
 
     };
 

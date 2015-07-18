@@ -194,7 +194,7 @@ namespace imn{
 
     protected:
         vMatrix mtx_;
-        inline void increm(unsigned& i, unsigned& j, std::ostream* stm = nullptr) const noexcept;
+        void increm(unsigned& i, unsigned& j, std::ostream* stm = nullptr) const noexcept;
 
     private:
         int x_min_;

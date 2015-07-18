@@ -152,7 +152,7 @@ std::string imn::Grid::grid_to_string() const
     return s;
 }
 
-inline void imn::Grid::increm(unsigned &i, unsigned &j, std::ostream* stm) const noexcept{
+void imn::Grid::increm(unsigned &i, unsigned &j, std::ostream* stm) const noexcept{
     if(++j == y_size_){
         j = 0;
         ++i;

@@ -49,11 +49,11 @@ void imn::OGrid::auto_von_Neumann(VonNeumann type)
 
     switch(type){
         case VonNeumann::pFlow:
-            func = pFlowFunc;
+            func = [&,this](unsigned i, unsigned j, Ptype t){ return this->pFlowFunc(i, j, t); };
             break;
 
         case VonNeumann::viFlow:
-            func = viFlowFunc;
+            func = [&,this](unsigned i, unsigned j, Ptype t){ return this->viFlowFunc(i, j, t); };
             break;
     }
 
@@ -63,7 +63,7 @@ void imn::OGrid::auto_von_Neumann(VonNeumann type)
             for(auto j = 1u; j < y_size()-1; ++j){
 
                 if( obstacle(xpos(i), ypos(j)) )
-                    (*this)(i, j) = func(i, j, type(i, j));
+                    (*this)(i, j) = func(i, j, con_type(i, j));
 
             }
         }
@@ -83,7 +83,7 @@ void imn::OGrid::von_Neumann_cond(imn::func2d function, imn::OGrid::Ptype pointT
         for(auto i = 1u; i < x_size()-1; ++i){
             for(auto j = 1u; j < y_size()-1; ++j){
 
-                if( obstacle(xpos(i), ypos(j)) && type(i, j) == pointType)
+                if( obstacle(xpos(i), ypos(j)) && con_type(i, j) == pointType)
                     (*this)(i, j) = function(xpos(i), ypos(j));
 
             }
@@ -95,7 +95,7 @@ void imn::OGrid::von_Neumann_cond(imn::func2d function, imn::OGrid::Ptype pointT
     }
 }
 
-imn::OGrid::Ptype imn::OGrid::type(unsigned i, unsigned j) const noexcept
+imn::OGrid::Ptype imn::OGrid::con_type(unsigned i, unsigned j) const noexcept
 {
     auto left = obstacle(xpos(i-1), ypos(j));
     auto right = obstacle(xpos(i+1), ypos(j));
