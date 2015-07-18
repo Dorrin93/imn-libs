@@ -1,8 +1,8 @@
 /**
- * \file   iter_schemes.hpp
- * \Author Bartłomiej Meder (bartem93@gmail.com)
- * \date   July, 2015
- * \brief  Differential equasions numerical methods
+ * @file   iter_schemes.hpp
+ * @author Bartłomiej Meder (bartem93@gmail.com)
+ * @date   July, 2015
+ * @brief  Differential equasions numerical methods
  *
  * Source for implementation of numerical methods created for solving partial elliptical differential equasions.       |
  */
@@ -11,13 +11,13 @@
 
 auto tt = [](double n){return n*n;};
 
-auto fdm = [](imn::Grid& grd, int x, int y, unsigned k, imn::func2d dens)
+auto fdm = [](imn::Grid& grd, unsigned x, unsigned y, unsigned k, imn::func2d dens)
 {
     return 0.25 * (grd(x+k, y) + grd(x-k, y) + grd(x, y+k) + grd(x, y-k) +
            k*k*grd.dx()*grd.dy()*dens(grd.x_min() + grd.dx()*x, grd.y_min() + grd.dy()*y));
 };
 
-auto integ = [](imn::Grid& grd, int x, int y, unsigned k, imn::func2d dens)
+auto integ = [](imn::Grid& grd, unsigned x, unsigned y, unsigned k, imn::func2d dens)
 {
     return 0.5 * (tt(grd(x+k, y)-grd(x, y)) + tt(grd(x, y+k)-grd(x,y))) -
            k*k*grd.dx()*grd.dy()*dens(grd.x_min() + x*grd.dx(), grd.y_min() + y*grd.dy())*grd(x, y);
@@ -44,14 +44,14 @@ void imn::poisson_pr(Grid &grd, double omega, func2d density, std::ofstream &fil
     for(; fabs(a - a_bf) >= tolerance; ++iter) {
         a_bf = a; a = 0;
 
-        for(std::size_t i = 1; i < grd.x_size() - 1; ++i){
-            for(std::size_t j = 1; j < grd.y_size() - 1; ++j){
+        for(auto i = 1u; i < grd.x_size() - 1; ++i){
+            for(auto j = 1u; j < grd.y_size() - 1; ++j){
                 grd(i, j) = (1-omega) * grd(i, j) + omega*fdm(grd, i, j, 1, density);
             }
         }
 
-        for(std::size_t i = 0; i < grd.x_size() - 1; ++i){
-            for(std::size_t j = 0; j < grd.y_size() - 1; ++j){
+        for(auto i = 0u; i < grd.x_size() - 1; ++i){
+            for(auto j = 0u; j < grd.y_size() - 1; ++j){
                 a += integ(grd, i, j, 1, density);
             }
         }
@@ -102,14 +102,14 @@ void imn::poisson_dens_grid(Grid &grd, double omega, unsigned k, func2d density,
         for(; fabs(a - a_bf) >= tolerance; ++iter) {
             a_bf = a; a = 0;
 
-            for(std::size_t i = k; i < grd.x_size() - k; i += k){
-                for(std::size_t j = k; j < grd.y_size() - k; j += k){
+            for(auto i = k; i < grd.x_size() - k; i += k){
+                for(auto j = k; j < grd.y_size() - k; j += k){
                     grd(i, j) = (1-omega) * grd(i, j) + omega*fdm(grd, i, j, k, density);
                 }
             }
 
-            for(std::size_t i = 0; i < grd.x_size() - k; i += k){
-                for(std::size_t j = 0; j < grd.y_size() - k; j += k){
+            for(auto i = 0u; i < grd.x_size() - k; i += k){
+                for(auto j = 0u; j < grd.y_size() - k; j += k){
                     a += integ(grd, i, j, k, density);
                 }
             }
@@ -131,18 +131,18 @@ void imn::poisson_dens_grid(Grid &grd, double omega, unsigned k, func2d density,
         }
 
         // grid densification
-        for(std::size_t i = k; i < grd.x_size() - k; i += k){
-            for(std::size_t j = k/2; j < grd.y_size() - k/2; j += k){
+        for(auto i = k; i < grd.x_size() - k; i += k){
+            for(auto j = k/2; j < grd.y_size() - k/2; j += k){
                 grd(i, j) = ( grd(i, j-k/2) + grd(i, j+k/2) ) / 2.;
             }
         }
-        for(std::size_t i = k/2; i < grd.x_size() - k/2; i += k){
-            for(std::size_t j = k; j < grd.y_size() - k; j += k){
+        for(auto i = k/2; i < grd.x_size() - k/2; i += k){
+            for(auto j = k; j < grd.y_size() - k; j += k){
                 grd(i, j) = ( grd(i-k/2, j) + grd(i+k/2, j) ) / 2.;
             }
         }
-        for(std::size_t i = k/2; i < grd.x_size() - k/2; i += k){
-            for(std::size_t j = k/2; j < grd.y_size() - k/2; j += k){
+        for(auto i = k/2; i < grd.x_size() - k/2; i += k){
+            for(auto j = k/2; j < grd.y_size() - k/2; j += k){
                 grd(i, j) = 0.25 * ( grd(i-k/2, j-k/2) + grd(i+k/2, j-k/2) + grd(i-k/2, j+k/2) + grd(i+k/2, j+k/2) );
             }
         }

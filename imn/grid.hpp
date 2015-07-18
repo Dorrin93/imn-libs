@@ -1,8 +1,8 @@
 /**
- * \file   grid.hpp
- * \Author Bartłomiej Meder (bartem93@gmail.com)
- * \date   July, 2015
- * \brief  Header of class containing (hopefully) pretty optimal 2D computational grid and all its parameters.
+ * @file   grid.hpp
+ * @author Bartłomiej Meder (bartem93@gmail.com)
+ * @date   July, 2015
+ * @brief  Header of class containing (hopefully) pretty optimal 2D computational grid and all its parameters.
  */
 #ifndef __IMN_GRID__
 #define __IMN_GRID__
@@ -10,10 +10,11 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <functional>
 
 /**
- * \addtogroup imn
- * \{
+ * @addtogroup imn
+ * @{
  */
 
 //* Engineering Numerical Methods functions
@@ -23,7 +24,7 @@ namespace imn{
      * Standard 2D funtion.
      * It could be, for example, density of potential.
      */
-    using func2d = double(*)(double, double);
+    using func2d = std::function<double(double, double)>;
 
     /**
      * @class Grid
@@ -56,32 +57,42 @@ namespace imn{
          */
         Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial = nullptr, bool widen = false);
 
+
+        enum class Edge{up, down, left, righ};
+
         /**
          * @brief Method for aplying function on whole grid.
          *
          * This method takes 2D double funtion, and applies it for the whole grid.
          *
-         * @param function Function to apply.
+         * @param function Function to apply
          */
         void apply_to_all(func2d function) noexcept;
 
         /**
-         * @brief Method for aplying function on the grid edges.
+         * @brief Method for applying function on the grid edges.
          *
          * This method takes 2D double funtion, and applies it only on grid edges.
          *
-         * @param function Function to apply.
+         * @param function Function to apply
          */
-        void apply_to_edge(func2d function) noexcept;
+        void apply_to_edges(func2d function) noexcept;
 
         /**
-         * @brief Method for aplying function on whole grid except edges.
+         * @brief Method for applying function on whole grid except edges.
          *
          * This method takes 2D double funtion, and applies it the whole grid, but omits its edges.
          *
-         * @param function Function to apply.
+         * @param function Function to apply
          */
-        void apply_not_to_edge(func2d function) noexcept;
+        void apply_not_to_edges(func2d function) noexcept;
+
+        /**
+         * @brief Method for applying function on the single grid edge.
+         * @param function Function to apply
+         * @param type Enum edge indication. Could be Edge::left, Edge::right, Edge::up and Edge::down
+         */
+        void apply_to_single(func2d function, Edge type) noexcept;
 
         /**
          * @brief Method setting whole grid to zero.
@@ -110,73 +121,91 @@ namespace imn{
         std::string grid_to_string() const;
 
         /**
+         * @brief Value on x-axis from given index
+         * @param i Index
+         * @return value on x-axis
+         */
+        double xpos(unsigned i) const noexcept { return x_min_ + i * dx_; }
+
+        /**
+         * @brief Value on y-axis from given index
+         * @pram j Index
+         * @return value on y-axis
+         */
+        double ypos(unsigned j) const noexcept { return y_min_ + j * dy_; }
+
+        /**
          * @param x Horizontal index
          * @param y Vertical index
          * @return Matrix value in given point
          */
-        double& operator()(unsigned x, unsigned y) noexcept {return _mtx[x * _x_size + y];}
+        double& operator()(unsigned x, unsigned y) noexcept {return mtx_[x * x_size_ + y];}
          /**
          * @param x Horizontal index
          * @param y Vertical index
          * @return Matrix value in given point
          */
-        double operator()(unsigned x, unsigned y) const noexcept {return _mtx[x * _x_size + y];}
+        double operator()(unsigned x, unsigned y) const noexcept {return mtx_[x * x_size_ + y];}
 
         /**
          * @brief x size getter.
          * @return size of x dimension
          */
-        std::size_t x_size() const noexcept {return _x_size;}
+        unsigned x_size() const noexcept {return x_size_;}
         /**
          * @brief y size getter
          * @return size of y dimension
          */
-        std::size_t y_size() const noexcept {return _y_size;}
+        unsigned y_size() const noexcept {return y_size_;}
         /**
          * @brief x min getter
          * @return minimal x value
          */
-        int x_min()  const noexcept {return _x_min;}
+        int x_min()  const noexcept {return x_min_;}
         /**
          * @brief x max getter
          * @return maximal x value
          */
-        int x_max() const noexcept {return _x_max;}
+        int x_max() const noexcept {return x_max_;}
         /**
          * @brief y min getter
          * @return minimal y value
          */
-        int y_min() const noexcept {return _y_min;}
+        int y_min() const noexcept {return y_min_;}
         /**
          * @brief y max getter
          * @return maximal y value
          */
-        int y_max() const noexcept {return _y_max;}
+        int y_max() const noexcept {return y_max_;}
         /**
          * @brief x step getter
          * @return x step value
          */
-        double dx() const noexcept {return _dx;}
+        double dx() const noexcept {return dx_;}
         /**
          * @brief y step getter
          * @return y step value
          */
-        double dy() const noexcept {return _dy;}
+        double dy() const noexcept {return dy_;}
 
         friend std::ostream& operator<<(std::ostream& os, const Grid& obj);
         Grid(const Grid&) = delete;
         Grid& operator=(const Grid&) = delete;
 
+    protected:
+        vMatrix mtx_;
+        inline void increm(unsigned& i, unsigned& j, std::ostream* stm = nullptr) const noexcept;
+
     private:
-        vMatrix _mtx;
-        int _x_min;
-        int _x_max;
-        int _y_min;
-        int _y_max;
-        double _dx;
-        double _dy;
-        std::size_t _x_size;
-        std::size_t _y_size;
+        int x_min_;
+        int x_max_;
+        int y_min_;
+        int y_max_;
+        double dx_;
+        double dy_;
+        unsigned x_size_;
+        unsigned y_size_;
+
     };
 
     //next operator<< declaration (damn you, compiler :< )
@@ -184,7 +213,7 @@ namespace imn{
 
 }
 
-/** \} End of group */
+/** @} End of group */
 
 
 #endif

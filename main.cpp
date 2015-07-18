@@ -9,8 +9,6 @@
 
 #ifdef __LAB2__
 #include "imn/iter_schemes.hpp"
-// just workaround, scroll further
-const auto rho1 = [](double x, double y){ return (1./(900.*M_PI))*exp(-(x/30.)*(x/30.)-(y/30.)*(y/30.)); };
 #endif
 
 int main(){
@@ -44,8 +42,8 @@ int main(){
 
     // then we need to define potential density
     // it's prety complicated, thus we will use two lambdas
-    // rho1 is global - workaround (sadly, you cannot cast capturing lambda to function)
-    const auto pdens = [](double x, double y) { return rho1(x - 30, y - 30) + rho1(x + 30, y + 30); };
+    const auto rho1 = [](double x, double y){ return (1./(900.*M_PI))*exp(-(x/30.)*(x/30.)-(y/30.)*(y/30.)); };
+    const auto pdens = [&rho1](double x, double y) { return rho1(x - 30, y - 30) + rho1(x + 30, y + 30); };
 
     // we want to find optimal omega value, so we will iterate through some candidates
     std::array<double, 6> omegas{0.75, 0.95, 1.2, 1.5, 1.95, 1.99};

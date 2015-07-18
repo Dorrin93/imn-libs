@@ -1,17 +1,14 @@
 /**
- * \file   diff_schemes.cxx
- * \Author Bartłomiej Meder (bartem93@gmail.com)
- * \date   June, 2015
- * \brief  Differential equasions numerical methods
+ * @file   diff_schemes.cxx
+ * @author Bartłomiej Meder (bartem93@gmail.com)
+ * @date   June, 2015
+ * @brief  Differential equasions numerical methods
  *
  * Source for implementation of numerical methods created for solving differential equasions.
  * Methods incudes explicit and impicit Euler methods and Runge-Kutta 4 scheme.
  */
 
 #include "diff_schemes.hpp"
-
-// testing auto purpose
-template<typename T>class TD;
 
 /////////////////////////////////////////////////////////////////////////////////////
 void imn::explicit_euler(input inp_func, double icondition, double dt, double begin, double end,
@@ -278,7 +275,6 @@ void imn::autostep_euler(input inp_func, double icondition, double init_dt,
         file.close();
 
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 void imn::rk4(rkfunc equasion1, rkfunc equasion2, double cond_x, double cond_y,

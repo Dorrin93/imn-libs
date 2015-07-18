@@ -1,8 +1,8 @@
 /**
- * \file   diff_schemes.hpp
- * \Author Bartłomiej Meder (bartem93@gmail.com)
- * \date   June, 2015
- * \brief  Differential equasions numerical methods
+ * @file   diff_schemes.hpp
+ * @author Bartłomiej Meder (bartem93@gmail.com)
+ * @date   June, 2015
+ * @brief  Differential equasions numerical methods
  *
  * Header for implementation of numerical methods created for solving differential equasions.
  * Methods incudes explicit and impicit Euler methods and Runge-Kutta 4 scheme.
@@ -14,10 +14,11 @@
 #include <fstream>
 #include <cmath>
 #include <iostream>
+#include <functional>
 
 /**
- * \addtogroup imn
- * \{
+ * @addtogroup imn
+ * @{
  */
 
 //* Engineering Numerical Methods functions
@@ -29,23 +30,23 @@ namespace imn {
     * First argument is time and second is some variable.
     * Could also be its own derivative.
     */
-    using input = double(*)(double, double);
+    using input = std::function<double(double, double)>;
 
     /**
     * Solution fuction
     * Funtion returning accurate solution of differential equasion.
     */
-    using solution = double(*)(double);
+    using solution = std::function<double(double)>;
 
     /**
     * Function for Runge-Kutta 4 scheme
     * First argument is time, next two are variables values.
     */
-    using rkfunc = double(*)(double, double, double);
+    using rkfunc = std::function<double(double, double, double)>;
 
 
     /**
-    * \brief Explicit Euler method
+    * @brief Explicit Euler method
     *
     * Function writes results to file.
     * If file is open, function just writes results.
@@ -56,19 +57,19 @@ namespace imn {
     * If solution function given:
     * moment_in_time euler_result accurate_result difference
     *
-    * \param inp_func Function we want to resolve
-    * \param icondition Initial condition
-    * \param dt Time step
-    * \param begin Beginning point of interval
-    * \param end Ending point of interval
-    * \param file Output file stream to write results
-    * \param sol_funct Accurate solution function. Default to 0 (NULL).
+    * @param inp_func Function we want to resolve
+    * @param icondition Initial condition
+    * @param dt Time step
+    * @param begin Beginning point of interval
+    * @param end Ending point of interval
+    * @param file Output file stream to write results
+    * @param sol_funct Accurate solution function. Default to 0 (NULL).
     */
     void explicit_euler(input inp_func, double icondition, double dt, double begin, double end, std::ofstream &file,
                         solution sol_func = 0);
 
     /**
-    * \brief Implicit Euler method
+    * @brief Implicit Euler method
     *
     * Function writes results to file.
     * If file is open, function just writes results.
@@ -79,20 +80,20 @@ namespace imn {
     * If solution function given:
     * moment_in_time euler_result accurate_result difference
     *
-    * \param inp_func Function we want to resolve
-    * \param inp_deriv Derivaive of function we want to resolve
-    * \param icondition Initial condition
-    * \param dt Time step
-    * \param begin Beginning point of interval
-    * \param end Ending point of interval
-    * \param file Output file stream to write results
-    * \param sol_funct Accurate solution function. Default to 0 (NULL).
+    * @param inp_func Function we want to resolve
+    * @param inp_deriv Derivaive of function we want to resolve
+    * @param icondition Initial condition
+    * @param dt Time step
+    * @param begin Beginning point of interval
+    * @param end Ending point of interval
+    * @param file Output file stream to write results
+    * @param sol_funct Accurate solution function. Default to 0 (NULL).
     */
     void implicit_euler(input inp_func, input inp_deriv, double icondition, double dt, double begin, double end,
                         std::ofstream &file, solution sol_func = 0);
 
     /**
-    * \brief Implicit Euler method with Newton iteration
+    * @brief Implicit Euler method with Newton iteration
     *
     * Function writes results to file.
     * If file is open, function just writes results.
@@ -103,21 +104,21 @@ namespace imn {
     * If solution function given:
     * moment_in_time iteration_count euler_result accurate_result difference
     *
-    * \param inp_func Function we want to resolve
-    * \param inp_deriv Derivaive of function we want to resolve
-    * \param icondition Initial condition
-    * \param dt Time step
-    * \param begin Beginning point of interval
-    * \param end Ending point of interval
-    * \param file Output file stream to write results
-    * \param stop Iteration stop condition (accuracy). Default to 1e-6.
-    * \param sol_funct Accurate solution function. Default to 0 (NULL).
+    * @param inp_func Function we want to resolve
+    * @param inp_deriv Derivaive of function we want to resolve
+    * @param icondition Initial condition
+    * @param dt Time step
+    * @param begin Beginning point of interval
+    * @param end Ending point of interval
+    * @param file Output file stream to write results
+    * @param stop Iteration stop condition (accuracy). Default to 1e-6.
+    * @param sol_funct Accurate solution function. Default to 0 (NULL).
     */
     void newton_euler(input inp_func, input inp_deriv, double icondition, double dt, double begin, double end,
                       std::ofstream &file, double stop = 1e-6, solution sol_func = 0);
 
     /**
-    * \brief Explicit Euler method with Richardson extrapolation
+    * @brief Explicit Euler method with Richardson extrapolation
     *
     * Function writes results to file.
     * If file is open, function just writes results.
@@ -128,20 +129,20 @@ namespace imn {
     * If solution function given:
     * moment_in_time euler_result accurate_result difference
     *
-    * \param inp_func Function we want to resolve
-    * \param icondition Initial condition
-    * \param dt Time step
-    * \param begin Beginning point of interval
-    * \param end Ending point of interval
-    * \param file Output file stream to write results
-    * \param sol_funct Accurate solution function. Default to 0 (NULL).
+    * @param inp_func Function we want to resolve
+    * @param icondition Initial condition
+    * @param dt Time step
+    * @param begin Beginning point of interval
+    * @param end Ending point of interval
+    * @param file Output file stream to write results
+    * @param sol_funct Accurate solution function. Default to 0 (NULL).
     *
     */
     void richardson_euler(input inp_func, double icondition, double dt, double begin, double end, std::ofstream &file,
                           solution sol_func = 0);
 
     /**
-     * \brief Explicit Euler method with Richardson extrapolation and
+     * @brief Explicit Euler method with Richardson extrapolation and
      * automatic time step selection algorithm
      *
      * Function writes results to file.
@@ -153,23 +154,23 @@ namespace imn {
      * If solution function given:
      * moment_in_time time_step euler_result accurate_result difference
      *
-     * \param inp_func Function we want to resolve
-     * \param icondition Initial condition
-     * \param init_dt Initial time step. If too high, file will contain only
-     * initial condition value.
-     * \param begin Beginning point of interval
-     * \param end Ending point of interval
-     * \param file Output file stream to write results
-     * \param tolerance Truncation error tolerance. Default to 1e-5.
-     * \param S Safety parameter. Must be S < 1. Default to 0.75.
-     * \param sol_funct Accurate solution function. Default to 0 (NULL).
+     * @param inp_func Function we want to resolve
+     * @param icondition Initial condition
+     * @param init_dt Initial time step. If too high, file will contain only
+     * @nitial condition value.
+     * @param begin Beginning point of interval
+     * @param end Ending point of interval
+     * @param file Output file stream to write results
+     * @param tolerance Truncation error tolerance. Default to 1e-5.
+     * @param S Safety parameter. Must be S < 1. Default to 0.75.
+     * @param sol_funct Accurate solution function. Default to 0 (NULL).
      *
      */
     void autostep_euler(input inp_func, double icondition, double init_dt, double begin, double end,
                         std::ofstream &file, double tolerance = 1e-5, double S = 0.75, solution sol_func = 0);
 
     /**
-     * \brief Explicit Runge-Kutta 4 scheme
+     * @brief Explicit Runge-Kutta 4 scheme
      *
      * Function writes results to file.
      * If file is open, function just writes results.
@@ -178,14 +179,14 @@ namespace imn {
      * Format:
      * moment_in_time x_value y_value
      *
-     * \param equasion1 First function to solve
-     * \param equasion2 Second function to solve
-     * \param cond_x Initial condition for x (1) variable
-     * \param cond_y Initial condition for y (2) variable
-     * \param dt Time step
-     * \param begin Beginning point of interval
-     * \param end Ending point of interval
-     * \param file Output file stream to write results
+     * @param equasion1 First function to solve
+     * @param equasion2 Second function to solve
+     * @param cond_x Initial condition for x (1) variable
+     * @param cond_y Initial condition for y (2) variable
+     * @param dt Time step
+     * @param begin Beginning point of interval
+     * @param end Ending point of interval
+     * @param file Output file stream to write results
      *
      */
     void rk4(rkfunc equasion1, rkfunc equasion2, double cond_x, double cond_y, double dt, double begin, double end,
@@ -193,6 +194,6 @@ namespace imn {
 
 }
 
-/** \} End of group */
+/** @} End of group */
 
 #endif
