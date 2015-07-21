@@ -4,9 +4,10 @@
  * @date   July, 2015
  * @brief  Implemenation of the 2D grid class.
  */
- #include "grid.hpp"
+#include "grid.hpp"
+#include <iostream>
 
- imn::Grid::Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial, bool widen):
+imn::Grid::Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial, bool widen):
     x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), dx_(dx), dy_(dy)
  {
     auto size = [](int min, int max, double df)
@@ -63,24 +64,25 @@ void imn::Grid::apply_to_single(imn::func2d function, imn::Grid::Edge type) noex
 {
     switch(type){
 
-        case Edge::left:
+        case Edge::LEFT:
             for(auto j = 0u; j < y_size_; ++j)
                 (*this)(0, j) = function(x_min_, ypos(j));
             break;
 
-        case Edge::righ:
+        case Edge::RIGHT:
             for(auto j = 0u; j < y_size_; ++j)
-                (*this)(x_size_ -1, j) = function(x_max_, ypos(j));
+                (*this)(x_size_-1, j) = function(x_max_, ypos(j));
             break;
 
-        case Edge::up:
+        case Edge::UP:
             for(auto i = 0u; i < x_size_; ++i)
-                (*this)(i, y_size_ -1) = function(xpos(i), y_max_);
+                (*this)(i, y_size_-1) = function(xpos(i), y_max_);
             break;
 
-        case Edge::down:
+        case Edge::DOWN:
             for(auto i = 0u; i < x_size_; ++i)
                 (*this)(i, 0) = function(xpos(i), y_min_);
+            break;
     }
 }
 
@@ -93,7 +95,7 @@ bool imn::Grid::write_to_file(std::ofstream &file, bool zeros) const
     // I could do that in one for loop, but I think this will be faster
     // In this case, you check zeros only once
     if(zeros){
-        for(auto it : mtx_){
+        for(const auto& it : mtx_){
             file << xpos(i) << " " << ypos(j) << " " << it << std::endl;
 
             increm(i, j, &file);
@@ -102,7 +104,7 @@ bool imn::Grid::write_to_file(std::ofstream &file, bool zeros) const
     else{
         // to avoid shitload of blank lines
         auto nn = false;
-        for(auto it : mtx_){
+        for(const auto& it : mtx_){
             if(it){
                 file << xpos(i) << " " << ypos(j) << " " << it << std::endl;
                 nn = true;
@@ -123,7 +125,7 @@ std::ostream& imn::operator<<(std::ostream& os, const imn::Grid& obj)
     auto i = 0u;
     auto j = 0u;
 
-    for(auto it : obj.mtx_){
+    for(const auto& it : obj.mtx_){
         os << obj.xpos(i) << " " << obj.ypos(j) << " " << it << std::endl;
 
         obj.increm(i, j, &os);
@@ -142,7 +144,7 @@ std::string imn::Grid::grid_to_string() const
     std::string s("");
     auto j = 0u;
 
-    for(auto it : mtx_){
+    for(const auto& it : mtx_){
 
         s.append(std::to_string(it) + " ");
 

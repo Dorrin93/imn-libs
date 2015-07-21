@@ -1,8 +1,8 @@
 /**
- * \file   utils.cxx
- * \Author Bartłomiej Meder (bartem93@gmail.com)
- * \date   July, 2015
- * \brief  Useful funtions implementations.
+ * @file   utils.cxx
+ * @author Bartłomiej Meder (bartem93@gmail.com)
+ * @date   July, 2015
+ * @brief  Useful funtions implementations.
  */
 #include "utils.hpp"
 

@@ -43,6 +43,14 @@ namespace imn{
         using vMatrix = std::vector<double>;
 
     public:
+        /**
+         * @brief Edge type indicator enum class
+         * @var UP
+         * @var DOWN
+         * @var LEFT
+         * @var RIGHT
+         */
+        enum class Edge{ UP, DOWN, LEFT, RIGHT };
 
         /**
          * @param x_min Minimal horizontal grid value.
@@ -57,9 +65,6 @@ namespace imn{
          */
         Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial = nullptr, bool widen = false);
 
-
-        enum class Edge{up, down, left, righ};
-
         /**
          * @brief Method for aplying function on whole grid.
          *
@@ -67,7 +72,7 @@ namespace imn{
          *
          * @param function Function to apply
          */
-        void apply_to_all(func2d function) noexcept;
+        void apply_to_all(const func2d function) noexcept;
 
         /**
          * @brief Method for applying function on the grid edges.
@@ -76,7 +81,7 @@ namespace imn{
          *
          * @param function Function to apply
          */
-        void apply_to_edges(func2d function) noexcept;
+        void apply_to_edges(const func2d function) noexcept;
 
         /**
          * @brief Method for applying function on whole grid except edges.
@@ -85,14 +90,14 @@ namespace imn{
          *
          * @param function Function to apply
          */
-        void apply_not_to_edges(func2d function) noexcept;
+        void apply_not_to_edges(const func2d function) noexcept;
 
         /**
          * @brief Method for applying function on the single grid edge.
          * @param function Function to apply
          * @param type Enum edge indication. Could be Edge::left, Edge::right, Edge::up and Edge::down
          */
-        void apply_to_single(func2d function, Edge type) noexcept;
+        void apply_to_single(const func2d function, const Edge type) noexcept;
 
         /**
          * @brief Method setting whole grid to zero.
@@ -108,7 +113,7 @@ namespace imn{
          *
          * @param file Output file stream we want write to.
          * @param zeros Indicator for omiting zero grid values. Defalut to false.
-         * @return False if ofstream closed, true if everything went fine.
+         * @return bool False if ofstream closed, true if everything went fine.
          */
         bool write_to_file(std::ofstream &file, bool zeros = true) const;
 
@@ -116,75 +121,93 @@ namespace imn{
          * @brief Grid-to-string conversion.
          *
          * Funtion writes grid to string in 2D matix manner, rather than gnuplot manner, so only grid values are taken.
-         * @return String representation of grid.
+         * @return std::string String representation of grid.
          */
         std::string grid_to_string() const;
 
         /**
          * @brief Value on x-axis from given index
          * @param i Index
-         * @return value on x-axis
+         * @return double value on x-axis
          */
         double xpos(unsigned i) const noexcept { return x_min_ + i * dx_; }
 
         /**
          * @brief Value on y-axis from given index
          * @pram j Index
-         * @return value on y-axis
+         * @return double value on y-axis
          */
         double ypos(unsigned j) const noexcept { return y_min_ + j * dy_; }
 
         /**
          * @param x Horizontal index
          * @param y Vertical index
-         * @return Matrix value in given point
+         * @return double Matrix value in given point
          */
-        double& operator()(unsigned x, unsigned y) noexcept {return mtx_[x * x_size_ + y];}
+        double& operator()(unsigned x, unsigned y) noexcept {return mtx_[x * y_size_ + y];}
          /**
          * @param x Horizontal index
          * @param y Vertical index
-         * @return Matrix value in given point
+         * @return double Matrix value in given point
          */
-        double operator()(unsigned x, unsigned y) const noexcept {return mtx_[x * x_size_ + y];}
+        double operator()(unsigned x, unsigned y) const noexcept {return mtx_[x * y_size_ + y];}
+
+        /**
+         * @brief Exception safe value return
+         * @param x Horizontal index
+         * @param y Vertical index
+         * @return double Matrix value in given point
+         * @throws out_of_range If x * y_size + y > vector size
+         */
+        double at(unsigned x, unsigned y) const { return mtx_.at(x * y_size_ + y); }
+
+        /**
+         * @brief Exception safe value return
+         * @param x Horizontal index
+         * @param y Vertical index
+         * @return double Matrix value in given point
+         * @throws out_of_range If x * y_size + y > vector size
+         */
+        double& at(unsigned x, unsigned y) { return mtx_.at(x * y_size_ + y); }
 
         /**
          * @brief x size getter.
-         * @return size of x dimension
+         * @return double size of x dimension
          */
         unsigned x_size() const noexcept {return x_size_;}
         /**
          * @brief y size getter
-         * @return size of y dimension
+         * @return double size of y dimension
          */
         unsigned y_size() const noexcept {return y_size_;}
         /**
          * @brief x min getter
-         * @return minimal x value
+         * @return int minimal x value
          */
-        int x_min()  const noexcept {return x_min_;}
+        int x_min() const noexcept {return x_min_;}
         /**
          * @brief x max getter
-         * @return maximal x value
+         * @return int maximal x value
          */
         int x_max() const noexcept {return x_max_;}
         /**
          * @brief y min getter
-         * @return minimal y value
+         * @return int minimal y value
          */
         int y_min() const noexcept {return y_min_;}
         /**
          * @brief y max getter
-         * @return maximal y value
+         * @return int maximal y value
          */
         int y_max() const noexcept {return y_max_;}
         /**
          * @brief x step getter
-         * @return x step value
+         * @return double x step value
          */
         double dx() const noexcept {return dx_;}
         /**
          * @brief y step getter
-         * @return y step value
+         * @return double y step value
          */
         double dy() const noexcept {return dy_;}
 
@@ -193,22 +216,23 @@ namespace imn{
         Grid& operator=(const Grid&) = delete;
 
     protected:
+        using gridFunc = std::function<double(unsigned, unsigned)>;
+
         vMatrix mtx_;
         void increm(unsigned& i, unsigned& j, std::ostream* stm = nullptr) const noexcept;
 
     private:
-        int x_min_;
-        int x_max_;
-        int y_min_;
-        int y_max_;
-        double dx_;
-        double dy_;
+        const int x_min_;
+        const int x_max_;
+        const int y_min_;
+        const int y_max_;
+        const double dx_;
+        const double dy_;
         unsigned x_size_;
         unsigned y_size_;
 
     };
 
-    //next operator<< declaration (damn you, compiler :< )
     std::ostream& operator<<(std::ostream& os, const Grid& obj);
 
 }

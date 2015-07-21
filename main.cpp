@@ -1,7 +1,7 @@
 #include<array>
 #include<memory>
 #include<iostream>
-#define __LAB2__
+#define __LAB3__
 
 #ifdef __LAB1__
 #include "imn/diff_schemes.hpp"
@@ -9,6 +9,10 @@
 
 #ifdef __LAB2__
 #include "imn/iter_schemes.hpp"
+#endif
+
+#ifdef __LAB3__
+#include "imn/p_flow.hpp"
 #endif
 
 int main(){
@@ -54,6 +58,17 @@ int main(){
     }
 
     imn::poisson_dens_grid(*grid, 1, 16, pdens, happiness, 1e-8, true);
+    #endif
+
+    #ifdef __LAB3__
+    // creating grid with obstacle possibilty
+    auto grid = std::make_unique<imn::OGrid>(0., 200., 0., 100., 1., 1.);
+
+    // setting obstacle - function taking doubles and returning bool, could be also lambda
+    grid->set_obstackle([](double x, double y){ return x >= 80 && x <= 120 && y >= 20 && y <= 80; } );
+
+    imn::stream_lines(*grid, 1., happiness);
+
     #endif
 
     return 0;
