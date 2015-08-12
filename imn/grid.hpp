@@ -43,6 +43,8 @@ namespace imn{
         using vMatrix = std::vector<double>;
 
     public:
+        using gridFunc = std::function<double(unsigned, unsigned)>;
+
         /**
          * @brief Edge type indicator enum class
          * @var UP
@@ -63,7 +65,8 @@ namespace imn{
          * zeros. Default to nullptr.
          * @param widen Indicator, if grid will be widen by one (sometimes it's useful). Default to false.
          */
-        Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial = nullptr, bool widen = false);
+        Grid(double x_min, double x_max, double y_min, double y_max, double dx, double dy, func2d initial = nullptr,
+             bool widen = false);
 
         /**
          * @brief Method for aplying function on whole grid.
@@ -91,6 +94,15 @@ namespace imn{
          * @param function Function to apply
          */
         void apply_not_to_edges(const func2d function) noexcept;
+
+        /**
+         * @brief Method for applying function on whole grid except edges by index instead of position.
+         *
+         * Function takes two unsigned "matrix" coordinates and assign function result to those coordinates.
+         *
+         * @param function Function to apply, defined as <double(unsigned, unsigned)>.
+         */
+        void apply_index_not_to_edges(const gridFunc function) noexcept;
 
         /**
          * @brief Method for applying function on the single grid edge.
@@ -130,27 +142,27 @@ namespace imn{
          * @param i Index
          * @return double value on x-axis
          */
-        double xpos(unsigned i) const noexcept { return x_min_ + i * dx_; }
+        double xpos(const unsigned i) const noexcept { return x_min_ + i * dx_; }
 
         /**
          * @brief Value on y-axis from given index
          * @pram j Index
          * @return double value on y-axis
          */
-        double ypos(unsigned j) const noexcept { return y_min_ + j * dy_; }
+        double ypos(const unsigned j) const noexcept { return y_min_ + j * dy_; }
 
         /**
          * @param x Horizontal index
          * @param y Vertical index
          * @return double Matrix value in given point
          */
-        double& operator()(unsigned x, unsigned y) noexcept {return mtx_[x * y_size_ + y];}
+        double& operator()(const unsigned x, const unsigned y) noexcept {return mtx_[x * y_size_ + y];}
          /**
          * @param x Horizontal index
          * @param y Vertical index
          * @return double Matrix value in given point
          */
-        double operator()(unsigned x, unsigned y) const noexcept {return mtx_[x * y_size_ + y];}
+        double operator()(const unsigned x, const unsigned y) const noexcept {return mtx_[x * y_size_ + y];}
 
         /**
          * @brief Exception safe value return
@@ -159,7 +171,7 @@ namespace imn{
          * @return double Matrix value in given point
          * @throws out_of_range If x * y_size + y > vector size
          */
-        double at(unsigned x, unsigned y) const { return mtx_.at(x * y_size_ + y); }
+        double at(const unsigned x, const unsigned y) const { return mtx_.at(x * y_size_ + y); }
 
         /**
          * @brief Exception safe value return
@@ -168,7 +180,7 @@ namespace imn{
          * @return double Matrix value in given point
          * @throws out_of_range If x * y_size + y > vector size
          */
-        double& at(unsigned x, unsigned y) { return mtx_.at(x * y_size_ + y); }
+        double& at(const unsigned x, const unsigned y) { return mtx_.at(x * y_size_ + y); }
 
         /**
          * @brief x size getter.
@@ -184,22 +196,22 @@ namespace imn{
          * @brief x min getter
          * @return int minimal x value
          */
-        int x_min() const noexcept {return x_min_;}
+        double x_min() const noexcept {return x_min_;}
         /**
          * @brief x max getter
          * @return int maximal x value
          */
-        int x_max() const noexcept {return x_max_;}
+        double x_max() const noexcept {return x_max_;}
         /**
          * @brief y min getter
          * @return int minimal y value
          */
-        int y_min() const noexcept {return y_min_;}
+        double y_min() const noexcept {return y_min_;}
         /**
          * @brief y max getter
          * @return int maximal y value
          */
-        int y_max() const noexcept {return y_max_;}
+        double y_max() const noexcept {return y_max_;}
         /**
          * @brief x step getter
          * @return double x step value
@@ -216,16 +228,15 @@ namespace imn{
         Grid& operator=(const Grid&) = delete;
 
     protected:
-        using gridFunc = std::function<double(unsigned, unsigned)>;
 
         vMatrix mtx_;
         void increm(unsigned& i, unsigned& j, std::ostream* stm = nullptr) const noexcept;
 
     private:
-        const int x_min_;
-        const int x_max_;
-        const int y_min_;
-        const int y_max_;
+        const double x_min_;
+        const double x_max_;
+        const double y_min_;
+        const double y_max_;
         const double dx_;
         const double dy_;
         unsigned x_size_;

@@ -7,10 +7,11 @@
 #include "grid.hpp"
 #include <iostream>
 
-imn::Grid::Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, func2d initial, bool widen):
+imn::Grid::Grid(double x_min, double x_max, double y_min, double y_max, double dx, double dy, func2d initial,
+                bool widen):
     x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), dx_(dx), dy_(dy)
  {
-    auto size = [](int min, int max, double df)
+    auto size = [](double min, double max, double df)
         {return static_cast<unsigned>(round((max - min) / df));};
 
     x_size_ = size(x_min_, x_max_, dx_);
@@ -21,7 +22,8 @@ imn::Grid::Grid(int x_min, int x_max, int y_min, int y_max, double dx, double dy
          ++y_size_;
      }
 
-    mtx_ = vMatrix(x_size_ * y_size_, 0);
+    mtx_.assign(x_size_ * y_size_, 0);
+
 
     if(initial)
         apply_to_all(initial);
@@ -159,5 +161,13 @@ void imn::Grid::increm(unsigned &i, unsigned &j, std::ostream* stm) const noexce
         j = 0;
         ++i;
         if(stm) *stm << std::endl;
+    }
+}
+
+void imn::Grid::apply_index_not_to_edges(const imn::Grid::gridFunc function) noexcept{
+    for(auto i = 1u; i < x_size_-1; ++i){
+        for(auto j = 1u; j < y_size_-1; ++j){
+            (*this)(i, j) = function(i, j);
+        }
     }
 }

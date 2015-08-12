@@ -41,6 +41,8 @@ void imn::poisson_pr(Grid &grd, double omega, func2d density, std::ofstream &fil
     auto a = 0.;
     auto a_bf = 1.;
 
+    grd.clear();
+
     for(; fabs(a - a_bf) >= tolerance; ++iter) {
         a_bf = a; a = 0;
 
@@ -94,6 +96,7 @@ void imn::poisson_dens_grid(Grid &grd, double omega, unsigned k, func2d density,
     file << "# n a" << std::endl;
 
     auto iter = 1L;
+
 
     for(; k > 0; k /= 2){
         auto a = 0.;

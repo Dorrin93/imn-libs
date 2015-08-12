@@ -8,6 +8,7 @@
 #define __IMN_OGIRD__
 #include "grid.hpp"
 #include <iostream>
+#include <tuple>
 
 /**
  * @addtogroup imn
@@ -69,8 +70,7 @@ namespace imn{
          * @param dy Vertical step.
          * @param widen Indicator, if grid will be widen by one (usualy useful). Default to true.
          */
-        OGrid(int x_min, int x_max, int y_min, int y_max, double dx, double dy, bool widen = true) :
-                Grid(x_min, x_max, y_min, y_max, dx, dy, nullptr, widen){}
+        OGrid(double x_min, double x_max, double y_min, double y_max, double dx, double dy, bool widen = true);
 
         /**
          * @brief Obstacle setter.
@@ -87,7 +87,7 @@ namespace imn{
          * @brief Obstacle getter.
          * @return std::function<bool(double, double)> Obstacle function.
          */
-        ofunc get_obstacle() const noexcept { return obstacle; }
+        ofunc get_obstacle() const noexcept { return obstacle_p_m; }
 
         /**
          * @brief Obstacle placement type getter.
@@ -136,8 +136,9 @@ namespace imn{
          * von_Neumann_cond method separatly for every obstacle edge / corner.
          *
          * @param type Type of problem we want to apply von Neumann conditions.
+         * @param other Used only in Viscous flow, for passing flux grid.
          */
-        void auto_von_Neumann(Condtype type);
+        void auto_von_Neumann(Condtype type, const OGrid *other = nullptr);
 
         /**
          * @brief Method for applying von Neuman condition for one specyfic point / edge type.
@@ -147,14 +148,20 @@ namespace imn{
         void von_Neumann_cond(const func2d function, const Ptype pointType);
 
     private:
-        using vNfunc = std::function<double(int, int, Ptype)>;
+        using vNfunc = std::function<double(int, int, Ptype, const OGrid*)>;
+        using vMatrixObsCoord = std::vector< std::tuple<unsigned, unsigned, Ptype> >;
+        using vMatrixCoord = std::vector< std::pair<unsigned, unsigned> >;
 
         ofunc obstacle = nullptr;
+        ofunc obstacle_p_m = nullptr;
         Obstype obs_type_;
 
-        Ptype con_type(unsigned i, unsigned j) const noexcept;
-        double pFlowFunc(unsigned i, unsigned j, Ptype type) const noexcept;
-        double viFlowFunc(unsigned i, unsigned j, Ptype type) const noexcept;
+        vMatrixObsCoord obs_in_;
+        vMatrixCoord obs_out_;
+
+        Ptype point_type(unsigned i, unsigned j) const noexcept;
+        double pFlowFunc(unsigned i, unsigned j, Ptype type, const OGrid *other = nullptr) const noexcept;
+        double viFlowFunc(unsigned i, unsigned j, Ptype type, const OGrid *other) const noexcept;
 
 
     };

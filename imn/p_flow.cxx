@@ -1,10 +1,10 @@
 /**
  * @file   p_flow.cxx
- * @Author Bartłomiej Meder (bartem93@gmail.com)
+ * @author Bartłomiej Meder (bartem93@gmail.com)
  * @date   July, 2015
- * @brief  TODO
+ * @brief  Potential flow numerical methods.
  *
- * TODO
+ * Source of implementation of numerical methods created for solving potential flow of liquids (Laplace equasion).
  */
 #include "p_flow.hpp"
 
@@ -12,38 +12,60 @@ auto sqr = [](double x){ return x * x; };
 
 void imn::stream_lines(OGrid &grd, double u0, std::ofstream &file, double eps, bool w_grid)
 {
-    // clear and initial conditions
+    base_lines(grd, u0, file, eps, w_grid, true);
+}
+
+void imn::potential_lines(OGrid& grd, double u0, std::ofstream& file, double eps, bool w_grid)
+{
+    base_lines(grd, u0, file, eps, w_grid, false);
+}
+
+
+void ::imn::base_lines(imn::OGrid &grd, double u0, std::ofstream &file, double eps, bool w_grid, bool stream)
+{
     grd.clear();
 
-    grd.apply_to_single([u0](double x, double y){ return u0*y; }, Grid::Edge::LEFT);
-    grd.apply_to_single([u0](double x, double y){ return u0*y; }, Grid::Edge::RIGHT);
-    grd.apply_to_single([&grd](double x, double y){ return grd(0, 0); }, Grid::Edge::DOWN);
-    grd.apply_to_single([&grd](double x, double y){ return grd(0, grd.y_size()-1); }, Grid::Edge::UP);
+    if(stream) {
 
-    switch (grd.obstacle_type()){
+        grd.apply_to_single([u0](double x, double y) { return u0 * y; }, Grid::Edge::LEFT);
+        grd.apply_to_single([u0](double x, double y) { return u0 * y; }, Grid::Edge::RIGHT);
+        grd.apply_to_single([&grd](double x, double y) { return grd(0, 0); }, Grid::Edge::DOWN);
+        grd.apply_to_single([&grd](double x, double y) { return grd(0, grd.y_size() - 1); }, Grid::Edge::UP);
 
-        case OGrid::Obstype::DOWN:
-            grd.apply_to_obstackle([&grd](double x, double y){ return grd(0, 0); });
-            break;
-        case OGrid::Obstype::UP:
-            grd.apply_to_obstackle([&grd](double x, double y){ return grd(0, grd.y_size()-1); });
-            break;
-        case OGrid::Obstype::MID:
-            grd.apply_to_obstackle([&grd](double x, double y){ return grd(0, (grd.y_size()-1) / 2); });
-            break;
+        switch (grd.obstacle_type()) {
+
+            case OGrid::Obstype::DOWN:
+                grd.apply_to_obstackle([&grd](double x, double y) { return grd(0, 0); });
+                break;
+            case OGrid::Obstype::UP:
+                grd.apply_to_obstackle([&grd](double x, double y) { return grd(0, grd.y_size() - 1); });
+                break;
+            case OGrid::Obstype::MID:
+                grd.apply_to_obstackle([&grd](double x, double y) { return grd(0, (grd.y_size() - 1) / 2); });
+                break;
+        }
     }
+
+    else
+        grd.apply_to_all([u0](double x, double y){ return u0 * x; });
 
     // file operations
     auto was_open = file.is_open();
+
     if(!was_open)
-        file.open("sl_integral.dat");
+        if(stream)
+            file.open("sl_integral.dat");
+        else
+            file.open("pl_integral.dat");
 
     file << "# n a" << std::endl;
 
     std::ofstream grdfile;
     if(w_grid)
-        grdfile.open("sl_grid.dat");
-
+        if(stream)
+            grdfile.open("sl_grid.dat");
+        else
+            grdfile.open("pl_grid.dat");
 
     // calculations
     auto a = 0.;
@@ -53,6 +75,9 @@ void imn::stream_lines(OGrid &grd, double u0, std::ofstream &file, double eps, b
 
     for(auto iter = 1L; fabs(a - a_bf) > eps; ++iter){
         a_bf = a; a = 0;
+
+        if(!stream)
+            grd.auto_von_Neumann(OGrid::Condtype::PFLOW, nullptr);
 
         grd.apply_index_not_to_obstackle(
                 [&grd](unsigned x, unsigned y){ return 0.25 * (grd(x-1, y) + grd(x+1, y) + grd(x, y-1) + grd(x, y+1)); }
@@ -66,6 +91,7 @@ void imn::stream_lines(OGrid &grd, double u0, std::ofstream &file, double eps, b
         }
 
         file << iter << " " << a << std::endl;
+
     }
 
     if(w_grid) {

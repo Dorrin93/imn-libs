@@ -1,7 +1,7 @@
 #include<array>
 #include<memory>
 #include<iostream>
-#define __LAB3__
+#define __LAB4__
 
 #ifdef __LAB1__
 #include "imn/diff_schemes.hpp"
@@ -13,6 +13,10 @@
 
 #ifdef __LAB3__
 #include "imn/p_flow.hpp"
+#endif
+
+#ifdef __LAB4__
+#include "imn/vi_flow.hpp"
 #endif
 
 int main(){
@@ -52,10 +56,8 @@ int main(){
     // we want to find optimal omega value, so we will iterate through some candidates
     std::array<double, 6> omegas{0.75, 0.95, 1.2, 1.5, 1.95, 1.99};
 
-    for(auto o : omegas){
+    for(const auto& o : omegas)
         imn::poisson_pr(*grid, o, pdens, happiness);
-        grid->clear();
-    }
 
     imn::poisson_dens_grid(*grid, 1, 16, pdens, happiness, 1e-8, true);
     #endif
@@ -68,6 +70,28 @@ int main(){
     grid->set_obstackle([](double x, double y){ return x >= 80 && x <= 120 && y >= 20 && y <= 80; } );
 
     imn::stream_lines(*grid, 1., happiness);
+
+    imn::potential_lines(*grid, 1., happiness);
+
+    #endif
+
+    #ifdef __LAB4__
+    // creating two grids - both needs to have same dimensions
+    auto fgrid = std::make_unique<imn::OGrid>(-1., 2., -0.5, 0.5, 0.01, 0.01);
+    auto vgrid = std::make_unique<imn::OGrid>(-1., 2., -0.5, 0.5, 0.01, 0.01);
+
+    // setting obstacle - function taking doubles and returning bool, could be also lambda, it must be set to both grids
+    auto obs = [](double x, double y){ return x >= -0.1 && x <= 0.1 && y >= -0.5 && y <= 0; };
+    fgrid->set_obstackle(obs);
+    vgrid->set_obstackle(obs);
+
+    // creating functions defining flux and vorticity
+    auto ffunc = [](double x, double y){ return -0.5 * ((y*y*y/3) - 0.5*0.5*y ); };
+    auto vfunc = [](double x, double y){ return -0.5 * 2*y; };
+
+    imn::poiseuille(*fgrid, *vgrid, ffunc, vfunc, happiness);
+
+    imn::ns_obstacle(*fgrid, *vgrid, ffunc, vfunc, happiness);
 
     #endif
 

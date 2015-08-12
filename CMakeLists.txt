@@ -10,7 +10,7 @@ add_subdirectory(imn)
 
 include_directories("${PROJECT_BINARY_DIR}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -lm -O2 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -lm -O3")
 
 set(SOURCE_FILES main.cpp)
 add_executable(imn_exe ${SOURCE_FILES})
