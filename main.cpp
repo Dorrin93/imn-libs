@@ -1,7 +1,7 @@
 #include<array>
 #include<memory>
 #include<iostream>
-#define __LAB4__
+#define __LAB7__
 
 #ifdef __LAB1__
 #include "imn/diff_schemes.hpp"
@@ -17,6 +17,10 @@
 
 #ifdef __LAB4__
 #include "imn/vi_flow.hpp"
+#endif
+
+#ifdef __LAB7__
+#include "wave_equation.hpp"
 #endif
 
 int main(){
@@ -92,6 +96,28 @@ int main(){
     imn::poiseuille(*fgrid, *vgrid, ffunc, vfunc, happiness);
 
     imn::ns_obstacle(*fgrid, *vgrid, ffunc, vfunc, happiness);
+
+    #endif
+
+    #ifdef __LAB7__
+    // first we need to define functions of posiztion, velocity and acceleration
+    auto u = [](double x, double t){ return cos(M_PI*t) * sin(M_PI*x) - 0.5 * cos(2*M_PI*t) * sin(2*M_PI*x); };
+    auto v = [](double x, double t){ return -M_PI * sin(M_PI*t) * sin(M_PI*x) + M_PI * sin(2*M_PI*t) * sin(2*M_PI*x); };
+    auto a = [](double x, double t){ return -M_PI*M_PI * cos(M_PI*t)*sin(M_PI*x) + 2*M_PI*M_PI * cos(2*M_PI*t)*sin(2*M_PI*x); };
+
+    // we will check solution in few time stamps
+    std::array<double, 9> stamps{0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2};
+
+    for(auto &it: stamps) {
+        imn::verlet_scheme(101, 0.01, 0, 2, 0.005, u, v, a, happiness, it, u);
+    }
+
+    // for next function we need to define initial position function
+    auto u0 = [](double x) { return exp(-100 * (x - 0.5) * (x - 0.5)); };
+
+    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::RIGID);
+    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::LOOSE);
+    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::TWIN_CENTER, 3., 0.75);
 
     #endif
 
