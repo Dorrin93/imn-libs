@@ -108,9 +108,8 @@ int main(){
     // we will check solution in few time stamps
     std::array<double, 9> stamps{0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2};
 
-    for(auto &it: stamps) {
+    for(auto& it: stamps)
         imn::verlet_scheme(101, 0.01, 0, 2, 0.005, u, v, a, happiness, it, u);
-    }
 
     // for next function we need to define initial position function
     auto u0 = [](double x) { return exp(-100 * (x - 0.5) * (x - 0.5)); };
@@ -118,6 +117,11 @@ int main(){
     imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::RIGID);
     imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::LOOSE);
     imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::TWIN_CENTER, 3., 0.75);
+
+    // we will check damped oscillation for three betas
+    std::array<double, 3> betas{0.2, 1.0, 3.0};
+    for(auto& it : betas)
+        imn::damped_oscillations(101, 0.01, 0, 4, 0.005, u0, it, happiness);
 
     #endif
 

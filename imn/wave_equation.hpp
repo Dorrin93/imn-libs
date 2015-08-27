@@ -42,7 +42,7 @@ namespace imn{
 
     void wave_solver(std::vector<double> &u_vals, std::vector<double> &v_vals, std::vector<double> &a_vals, double t_min,
                      double t_max, double dt, double dx, ProblemType type, std::ofstream &ofile, double t_w, func2d u_sol,
-                     double rho, double boundary);
+                     double rho, double boundary, double beta);
 
 }
 

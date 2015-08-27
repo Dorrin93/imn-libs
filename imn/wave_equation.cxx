@@ -26,7 +26,7 @@ void imn::verlet_scheme(unsigned grid_density, double dx, double t_min, double t
     }
 
     wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::VERLET, file, t_write,
-                u_sol, 1, 0);
+                u_sol, 1, 0, 0);
 
     if(!was_open)
         file.close();
@@ -64,31 +64,60 @@ void imn::boundary_of_center(unsigned grid_density, double dx, double t_min, dou
 
     switch (condition_type){
         case InitType::RIGID:
-            wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::BOC_R, file, -1, nullptr, density,
-                        boundary_x); break;
+            wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::BOC_R, file, -1,
+                        nullptr, density, boundary_x, 0); break;
         case InitType::LOOSE:
-            wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::BOC_L, file, -1, nullptr, density,
-                        boundary_x); break;
+            wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::BOC_L, file, -1,
+                        nullptr, density, boundary_x, 0); break;
         case InitType::TWIN_CENTER:
-            wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::BOC_TC, file, -1, nullptr, density,
-                        boundary_x); break;
+            wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::BOC_TC, file, -1,
+                        nullptr, density, boundary_x, 0); break;
 
     }
-
 
     if(!was_open)
         file.close();
 }
 
+
+void ::imn::damped_oscillations(unsigned grid_density, double dx, double t_min, double t_max, double dt,
+                                imn::initFunc u, double beta, std::ofstream &file)
+{
+    auto was_open = file.is_open();
+    if(!was_open)
+        file.open("damped_oscillations_" + imn::double_to_string(beta) + ".dat");
+
+    std::vector<double> u_vals(grid_density);
+    std::vector<double> v_vals(grid_density, 0);
+    std::vector<double> a_vals(grid_density, 0);
+
+    for(auto i = 0u; i < grid_density; ++i)
+        u_vals[i] = u(i*dx);
+
+    u_vals[0] = u_vals[grid_density-1] = 0;
+
+    wave_solver(u_vals, v_vals, a_vals, t_min, t_max, dt, dx, ProblemType::DAMPED, file, -1, nullptr, 1, 0, beta);
+
+    if(!was_open)
+        file.close();
+
+}
+
 void ::imn::wave_solver(std::vector<double> &u_vals, std::vector<double> &v_vals, std::vector<double> &a_vals, double t_min,
                  double t_max, double dt, double dx, ProblemType type, std::ofstream &ofile, double t_w, func2d u_sol,
-                 double rho, double boundary)
+                 double rho, double boundary, double beta)
 {
     auto iter = 0l;
     auto size = u_vals.size();
     auto dens = 1.;
 
+    std::vector<double> u_prev(size, 0);
+
     for(auto t = t_min; t <= t_max; t += dt, ++iter){
+
+        if(type == ProblemType::DAMPED){
+            u_prev = u_vals;
+        }
 
         for(auto i = 0u; i < size; ++i){
             v_vals[i] = v_vals[i] + 0.5 * dt * a_vals[i];
@@ -105,7 +134,7 @@ void ::imn::wave_solver(std::vector<double> &u_vals, std::vector<double> &v_vals
             if(type == ProblemType::BOC_TC)
                 i*dx < boundary ? dens = 1 : dens = rho;
 
-            a_vals[i] = (u_vals[i+1] + u_vals[i-1] - 2 * u_vals[i]) / (dens * dx * dx);
+            a_vals[i] = (u_vals[i+1] + u_vals[i-1] - 2 * u_vals[i]) / (dens * dx * dx) - 2 * beta * ((u_vals[i] - u_prev[i]) / dt);
         }
 
         for(auto i = 0u; i < size; ++i)
@@ -147,3 +176,4 @@ void ::imn::wave_solver(std::vector<double> &u_vals, std::vector<double> &v_vals
     }
 
 }
+
