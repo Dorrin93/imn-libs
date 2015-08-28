@@ -7,6 +7,7 @@
 #ifndef __IMN_UTILS__
 #define __IMN_UTILS__
 #include <string>
+#include <functional>
 
 /**
  * @addtogroup imn
@@ -15,6 +16,20 @@
 
 //* Engineering Numerical Methods functions
 namespace imn{
+
+    /**
+     * @brief Two-dimensional function
+     *
+     * It could be function of location and time, or x-location and y-location etc.
+     */
+    using func2d = std::function<double(double, double)>;
+
+    /**
+     * @brief Initial funtion
+     *
+     * Function of location when time = 0
+     */
+    using initFunc = std::function<double(double)>;
 
     /**
      * @brief Casting double to string

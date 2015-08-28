@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include "utils.hpp"
 
 /**
  * @addtogroup imn
@@ -19,12 +20,6 @@
 
 //* Engineering Numerical Methods functions
 namespace imn{
-
-    /**
-     * Standard 2D funtion.
-     * It could be, for example, density of potential.
-     */
-    using func2d = std::function<double(double, double)>;
 
     /**
      * @class Grid

@@ -22,27 +22,32 @@
 //* Engineering Numerical Methods functions
 namespace imn{
 
-    enum class InitType {RIGID, LOOSE, TWIN_CENTER};
+    using func2dOm = std::function<double(double, double, double)>;
 
+    enum class WaveInitType {RIGID, LOOSE, TWIN_CENTER};
 
-    using func2d = std::function<double(double, double)>;
-
-    using initFunc = std::function<double(double)>;
 
     void verlet_scheme(unsigned grid_density, double dx, double t_min, double t_max, double dt, func2d u, func2d v,
                        func2d a, std::ofstream& file, double t_write = -1, func2d u_sol = nullptr);
 
     void boundary_of_center(unsigned grid_density, double dx, double t_min, double t_max, double dt, initFunc u,
-                            std::ofstream& file, InitType condition_type, double density = 1, double boundary_x = 0.5);
+                            std::ofstream& file, WaveInitType condition_type, double density = 1, double boundary_x = 0.5);
 
     void damped_oscillations(unsigned grid_density, double dx, double t_min, double t_max, double dt, initFunc u,
                              double beta, std::ofstream& file);
 
-    enum class ProblemType {VERLET, BOC_R, BOC_L, BOC_TC, DAMPED};
+    void forced_oscillations(unsigned grid_density, double dx, double t_min, double t_max, double dt, double beta,
+                             func2d force, std::ofstream &file);
+
+    void resonances_enegry(unsigned grid_density, double dx, double t_min, double t_max, double dt, double t_res,
+                           double beta, double om_min, double om_max, double dom, std::ofstream &file, func2dOm force);
+
+
+    enum class WaveProblemType {VERLET, BOC_R, BOC_L, BOC_TC, DAMPED, FORCED};
 
     void wave_solver(std::vector<double> &u_vals, std::vector<double> &v_vals, std::vector<double> &a_vals, double t_min,
-                     double t_max, double dt, double dx, ProblemType type, std::ofstream &ofile, double t_w, func2d u_sol,
-                     double rho, double boundary, double beta);
+                     double t_max, double dt, double dx, WaveProblemType type, std::ofstream &ofile, double t_w, func2d u_sol,
+                     double rho, double boundary, double beta, func2d force);
 
 }
 

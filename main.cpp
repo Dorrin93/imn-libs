@@ -114,14 +114,21 @@ int main(){
     // for next function we need to define initial position function
     auto u0 = [](double x) { return exp(-100 * (x - 0.5) * (x - 0.5)); };
 
-    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::RIGID);
-    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::LOOSE);
-    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::InitType::TWIN_CENTER, 3., 0.75);
+    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::WaveInitType::RIGID);
+    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::WaveInitType::LOOSE);
+    imn::boundary_of_center(101, 0.01, 0, 2, 0.005, u0, happiness, imn::WaveInitType::TWIN_CENTER, 3., 0.75);
 
     // we will check damped oscillation for three betas
     std::array<double, 3> betas{0.2, 1.0, 3.0};
     for(auto& it : betas)
         imn::damped_oscillations(101, 0.01, 0, 4, 0.005, u0, it, happiness);
+
+    // we need to define force for forced oscillations
+    auto f = [](double x, double t){ return cos(t * 0.5 * M_PI) * exp(-1e5 * (x - 0.5) * (x - 0.5)); };
+    imn::forced_oscillations(101, 0.01, 0, 10, 0.005, 1.0, f, happiness);
+
+    auto fOm = [](double x, double t, double omega){ return cos(t * omega) * exp(-1e5 * (x - 0.5) * (x - 0.5)); };
+    imn::resonances_enegry(101, 0.01, 0, 20, 0.005, 16, 1.0, 0, 10*M_PI, 0.01, happiness, fOm);
 
     #endif
 
