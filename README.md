@@ -11,18 +11,18 @@ More info in pdf files in each directory.
 Materials are not mine, I have only implemented methods.  
 All pdfs downloaded from [here](http://galaxy.agh.edu.pl/~dzebrow/).  
 
-**Project progres:** about 60%
+**Project progres:** about 70%
 
 ## Already implemented:  
 1. Implicit and explicit differential equasions  
 2. Iterative differential equasions  
 3. Potential flow
 4. Viscous flow 
+7. Wave equasion  
   
 ## Not implemented:  
 5. 2D advection  
 6. Diffusion equasion (heat transfer)  
-7. Wave equasion  
   
 ## Eventual future improvements:  
 * GUI utilizing PyQt (extending python with C++) and Gnuplot  
