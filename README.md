@@ -11,7 +11,7 @@ More info in pdf files in each directory.
 Materials are not mine, I have only implemented methods.  
 All pdfs downloaded from [here](http://galaxy.agh.edu.pl/~dzebrow/).  
 
-**Project progres:** about 70%
+**Project progres:** project suspended
 
 ## Already implemented:  
 1. Implicit and explicit differential equasions  
@@ -23,7 +23,3 @@ All pdfs downloaded from [here](http://galaxy.agh.edu.pl/~dzebrow/).
 ## Not implemented:  
 5. 2D advection  
 6. Diffusion equasion (heat transfer)  
-  
-## Eventual future improvements:  
-* GUI utilizing PyQt (extending python with C++) and Gnuplot  
-* Parallelization of possible algorithms  
